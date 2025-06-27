@@ -138,212 +138,39 @@ const PRDCreator = () => {
     setError("");
     setGeneratedPRD("");
 
-    const prompt = `Create a professional PRD based on these inputs following the company template format:
-
-1. Product/Feature: ${formData.question1}
-2. Target Users & Problem: ${formData.question2}
-3. Key Features & Success Metrics: ${formData.question3}
-4. Technology Stack & Integrations: ${formData.question4}
-5. Out of Scope Items: ${formData.question5}
-6. Timeline & Development Phases: ${formData.question6}
-7. Risks, Challenges & Dependencies: ${formData.question7}
-8. Business Requirements & Strategic Alignment: ${formData.question8}
-
-Use this template structure and format, filling in all sections with specific details based on the inputs provided:
-
-# [PROJECT_NAME] - Summary, Scope, and Key Decisions
-
-**Date:** ${new Date().toLocaleDateString()}
-**Participants:** Product Team, Engineering Team, Design Team
-
-## Executive Summary
-[Comprehensive overview covering: what the product/feature is, who the target users are, the core problem being solved, key functionality being delivered, and expected business outcomes]
-
-## Key Decisions Made
-
-### Product Strategy
-**Target Audience:** [Specific user segment from input 2]
-**Core Problem:** [Main problem statement from input 2]
-**Value Proposition:** [Key value delivered from inputs 1 and 3]
-**Success Definition:** [Success metrics from input 3]
-
-### User Experience & Interface
-#### User Journey (Multi-Step Process)
-**Discovery & Onboarding**
-- [How users discover and start using the feature]
-- [Initial setup or configuration needed]
-- User Action: [Specific onboarding actions required]
-
-**Core Usage & Engagement**
-- [Primary user workflows and interactions]
-- [Key feature utilization patterns]
-- Demo Notes: [Key demo scenarios for stakeholders]
-- User Action: [Main user actions during regular use]
-
-### Core Features
-**[Feature 1]:** [Detailed description and user value]
-**[Feature 2]:** [Detailed description and user value]
-**[Feature 3]:** [Detailed description and user value]
-**[Feature 4]:** [Detailed description and user value]
-Demo Notes: [Critical features to demonstrate to stakeholders]
-
-### Technical Implementation
-**Technology Stack:** [Technology choices from input 4]
-**Key Integrations:** [Integration requirements from input 4]
-Demo Notes: [Technical capabilities to showcase]
-
-### Development Strategy
-**Development Approach:** [Methodology based on input 6]
-**Phase Structure:** [Phase breakdown from input 6]
-Demo Notes: [Milestone demonstration plan]
-**Integration Strategy:** [How it fits with existing systems from input 4]
-**Resource Requirements:** [Team and resource needs]
-
-**Timeline Breakdown:**
-[Parse input 6 and create detailed timeline with specific teams and deliverables]
-
-**Total:** [Total project duration from input 6]
-
-## Technical Specifications
-
-### Architecture & Platform
-**Technology Stack:** [Detailed tech stack from input 4]
-**Integration Points:** [Specific integrations from input 4]
-**Performance Requirements:** [Performance considerations implied by features]
-
-### Data & Storage
-**Data Models:** [Data requirements based on features from input 3]
-**Storage Requirements:** [Database/storage needs from input 4]
-**Security Considerations:** [Security measures from inputs 4 and 8]
-
-### APIs & Interfaces
-**External APIs:** [Third-party integrations from input 4]
-**Internal APIs:** [System interfaces from input 4]
-**User Interface:** [UI approach from input 4]
-
-## Scope Boundaries
-
-### Out of Scope / Not Supported
-[Transform input 5 into structured out-of-scope items with explanations]
-
-## Feature Prioritization Framework
-
-### Layer 1: Essential Foundation ("Core Engine")
-**Description:** Must-have features for basic functionality and user value
-[Extract must-have features from inputs 3 and 6]
-
-**Timeline:** [Phase 1 dates from input 6]
-
-### Layer 2: Value Enhancement ("Polish & Power")
-**Description:** Important features that significantly improve user experience
-[Extract enhancement features from inputs 3 and 6]
-
-**Timeline:** [Phase 2 dates from input 6]
-
-### Layer 3: Future Enhancements
-**Description:** Nice-to-have features for future consideration
-[Extract future features from inputs 3 and 5]
-
-## Business Context & Strategic Alignment
-
-### Primary Business Objectives
-[Extract business objectives from input 8]
-
-### Strategic Priorities
-[Extract strategic alignment from input 8]
-
-### Value Propositions Validated
-[Combine insights from inputs 2, 3, and 8]
-
-## Implementation Approach
-
-### Timeline & Methodology
-[Based on input 6]
-
-### Communication Plan
-**Weekly Standups:** Progress tracking and blocker resolution
-**Sprint Reviews:** Demo and stakeholder feedback sessions
-**Documentation:** Centralized documentation and version control approach
-
-### Quality Assurance
-**Unit Testing:** Automated test coverage approach
-**Integration Testing:** End-to-end user journey validation
-**User Testing:** Feedback collection with target users
-
-## Open Items & Next Steps
-
-### Immediate Actions
-[Based on typical next steps for this type of project]
-
-### Decisions Pending
-[Extract pending decisions from input 7]
-
-### Risk Mitigation
-[Transform input 7 into structured risk mitigation strategies]
-
-## Meeting Outcomes
-Clear alignment achieved on product vision, target users, core functionality, and technical approach. All stakeholders understand the scope boundaries, timeline, and their roles in delivery.
-
-Strong consensus on the phased development approach, which balances early value delivery with manageable complexity and allows for iterative feedback incorporation.
-
-IMPORTANT: Replace ALL bracketed placeholders with specific, detailed content based on the 8 inputs provided. Be concrete and actionable rather than generic.`;
-
     try {
-      // Note: In a real implementation, you'd call an API like OpenAI or Claude
-      // For demo purposes, this creates a structured response
-      const mockResponse = `# ${formData.question1
-        .split(" ")
-        .slice(0, 3)
-        .join(" ")} Dashboard - Summary, Scope, and Key Decisions
+      const response = await fetch("/api/generate-prd", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ formData }),
+      });
 
-**Date:** ${new Date().toLocaleDateString()}
-**Participants:** Product Team, Engineering Team, Design Team
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to generate PRD");
+      }
 
-## Executive Summary
-This project delivers ${
-        formData.question1
-      } to address the core challenges faced by ${
-        formData.question2
-      }. The solution will provide ${
-        formData.question3
-      } with a focus on measurable impact and user value.
+      const data = await response.json();
 
-## Key Decisions Made
+      // Add a note about which method was used
+      const sourceNote =
+        data.source === "claude"
+          ? "<!-- Generated using Claude AI -->\n\n"
+          : "<!-- Generated using template (no Claude API key) -->\n\n";
 
-### Product Strategy
-**Target Audience:** ${formData.question2}
-**Core Problem:** Lack of visibility and efficiency in current workflows
-**Value Proposition:** Streamlined collaboration with real-time insights
-**Success Definition:** ${formData.question3}
+      const fullPRD = sourceNote + data.prd;
 
-### Technical Implementation
-**Technology Stack:** ${formData.question4}
-**Key Integrations:** Seamless integration with existing tools and workflows
+      // Stream the response for better UX
+      const words = fullPRD.split(" ");
+      let fullResponse = "";
 
-### Development Strategy
-**Timeline:** ${formData.question6}
-**Risk Mitigation:** ${formData.question7}
-**Business Alignment:** ${formData.question8}
-
-## Scope Boundaries
-### Out of Scope
-${formData.question5}
-
-## Next Steps
-- Finalize technical architecture
-- Begin Phase 1 development
-- Set up monitoring and analytics
-- Schedule regular stakeholder reviews`;
-
-      // Simulate typing effect
-      const words = mockResponse.split(" ");
       for (let i = 0; i < words.length; i++) {
-        const partialResponse = words.slice(0, i + 1).join(" ");
-        setGeneratedPRD(partialResponse);
-        await new Promise((resolve) => setTimeout(resolve, 30));
+        fullResponse += words[i] + " ";
+        setGeneratedPRD(fullResponse);
+        await new Promise((resolve) => setTimeout(resolve, 20));
       }
     } catch (err) {
-      setError("Failed to generate PRD. Please try again.");
+      setError(err.message || "Failed to generate PRD. Please try again.");
       console.error("Error generating PRD:", err);
     }
 
