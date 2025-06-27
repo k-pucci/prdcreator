@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import PRDCreator from '../components/prdcreator';
+import PRDCreator from '../components/PRDCreator';
 
 export default function Home({ isAuthenticated }) {
   const [authenticated, setAuthenticated] = useState(isAuthenticated);
