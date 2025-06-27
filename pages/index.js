@@ -99,18 +99,7 @@ export default function Home({ isAuthenticated }) {
     );
   }
 
-  return (
-    <div className="relative">
-      {/* Logout button - positioned to not interfere with copy/download */}
-      <button
-        onClick={handleLogout}
-        className="absolute top-4 left-4 z-50 px-3 py-1 text-sm bg-white/80 hover:bg-white text-gray-600 hover:text-gray-800 rounded-md border border-gray-200 transition-all shadow-sm"
-      >
-        Logout
-      </button>
-      <PRDCreator />
-    </div>
-  );
+  return <PRDCreator onLogout={handleLogout} />;
 }
 
 // Server-side authentication check

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FileText, Copy, Download, Loader2 } from "lucide-react";
 
-const PRDCreator = () => {
+const PRDCreator = ({ onLogout }) => {
   const [formData, setFormData] = useState({
     question1: "",
     question2: "",
@@ -203,12 +203,24 @@ const PRDCreator = () => {
       {/* Left Side - Input Section */}
       <div className="w-1/2 p-8 overflow-y-auto relative z-10">
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Company PRD Creator
-          </h1>
-          <p className="text-gray-700">
-            Turn your ideas into comprehensive product requirement documents
-          </p>
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Company PRD Creator
+              </h1>
+              <p className="text-gray-700">
+                Turn your ideas into comprehensive product requirement documents
+              </p>
+            </div>
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="px-3 py-1 text-sm bg-white/80 hover:bg-white text-gray-600 hover:text-gray-800 rounded-md border border-gray-200 transition-all shadow-sm backdrop-blur-sm"
+              >
+                Logout
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="bg-white/80 backdrop-blur-lg rounded-xl shadow-xl border border-white/50 p-6">
