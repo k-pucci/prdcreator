@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FileText, Copy, Download, Loader2 } from "lucide-react";
+import { FileText, Copy, Download, Loader2, Upload, X, File } from "lucide-react";
 
 const PRDCreator = ({ onLogout }) => {
   const [formData, setFormData] = useState({
@@ -12,12 +12,14 @@ const PRDCreator = ({ onLogout }) => {
     question7: "",
     question8: "",
   });
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [showFileUpload, setShowFileUpload] = useState(false);
   const [generatedPRD, setGeneratedPRD] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
   const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
 
-  // Sample examples
+  // Sample examples for the 8 questions
   const sampleExamples = [
     {
       name: "Team Dashboard",
@@ -88,9 +90,13 @@ const PRDCreator = ({ onLogout }) => {
   ];
 
   const handleExampleClick = () => {
-    const nextIndex = (currentExampleIndex + 1) % sampleExamples.length;
-    setCurrentExampleIndex(nextIndex);
-    setFormData(sampleExamples[nextIndex].data);
+    if (showFileUpload) {
+      setShowFileUpload(false);
+    } else {
+      const nextIndex = (currentExampleIndex + 1) % sampleExamples.length;
+      setCurrentExampleIndex(nextIndex);
+      setFormData(sampleExamples[nextIndex].data);
+    }
   };
 
   const handleInputChange = (field, value) => {
@@ -98,6 +104,47 @@ const PRDCreator = ({ onLogout }) => {
       ...prev,
       [field]: value,
     }));
+  };
+
+  const handleFileUpload = (event) => {
+    const files = Array.from(event.target.files);
+    const remainingSlots = 3 - uploadedFiles.length;
+    const filesToAdd = files.slice(0, remainingSlots);
+
+    filesToAdd.forEach(file => {
+      // Only allow text files, PDFs, and documents
+      const allowedTypes = ['text/plain', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type) && !file.name.endsWith('.txt')) {
+        setError(`File "${file.name}" is not supported. Please upload text, PDF, or Word documents.`);
+        return;
+      }
+
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        setError(`File "${file.name}" is too large. Maximum size is 10MB.`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const fileData = {
+          name: file.name,
+          content: e.target.result,
+          type: file.type,
+          size: file.size
+        };
+        setUploadedFiles(prev => [...prev, fileData]);
+      };
+      reader.readAsText(file);
+    });
+  };
+
+  const removeFile = (index) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const toggleFileUpload = () => {
+    setShowFileUpload(!showFileUpload);
+    setError('');
   };
 
   // Convert markdown to HTML
@@ -135,45 +182,52 @@ const PRDCreator = ({ onLogout }) => {
 
   const generatePRD = async () => {
     setIsGenerating(true);
-    setError("");
-    setGeneratedPRD("");
-
+    setError('');
+    setGeneratedPRD('');
+    
     try {
-      const response = await fetch("/api/generate-prd", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ formData }),
+      const response = await fetch('/api/generate-prd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          formData,
+          uploadedFiles: uploadedFiles.map(file => ({
+            name: file.name,
+            content: file.content
+          }))
+        })
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to generate PRD");
+        throw new Error(errorData.error || 'Failed to generate PRD');
       }
 
       const data = await response.json();
-
+      
       // Add a note about which method was used
-      const sourceNote =
-        data.source === "claude"
-          ? "<!-- Generated using Claude AI -->\n\n"
-          : "<!-- Generated using template (no Claude API key) -->\n\n";
-
+      const fileNote = uploadedFiles.length > 0 ? ` with ${uploadedFiles.length} supporting file${uploadedFiles.length > 1 ? 's' : ''}` : '';
+      const sourceNote = data.source === 'claude' 
+        ? `<!-- Generated using Claude AI from 8 questions${fileNote} -->\n\n` 
+        : `<!-- Generated using template from 8 questions${fileNote} (no Claude API key) -->\n\n`;
+      
       const fullPRD = sourceNote + data.prd;
-
+      
       // Stream the response for better UX
-      const words = fullPRD.split(" ");
-      let fullResponse = "";
-
+      const words = fullPRD.split(' ');
+      let fullResponse = '';
+      
       for (let i = 0; i < words.length; i++) {
-        fullResponse += words[i] + " ";
+        fullResponse += words[i] + ' ';
         setGeneratedPRD(fullResponse);
-        await new Promise((resolve) => setTimeout(resolve, 20));
+        await new Promise(resolve => setTimeout(resolve, 20));
       }
+      
     } catch (err) {
-      setError(err.message || "Failed to generate PRD. Please try again.");
-      console.error("Error generating PRD:", err);
+      setError(err.message || 'Failed to generate PRD. Please try again.');
+      console.error('Error generating PRD:', err);
     }
-
+    
     setIsGenerating(false);
   };
 
@@ -230,15 +284,82 @@ const PRDCreator = ({ onLogout }) => {
                 8 Key Questions
               </h2>
               <button
-                onClick={handleExampleClick}
+                onClick={showFileUpload ? toggleFileUpload : handleExampleClick}
                 className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-white/60 hover:bg-white/80 text-gray-700 rounded-full transition-all backdrop-blur-sm border border-white/40 hover:shadow-md"
               >
-                <span>{sampleExamples[currentExampleIndex].icon}</span>
-                <span>Try: {sampleExamples[currentExampleIndex].name}</span>
+                {showFileUpload ? (
+                  <>
+                    <span>{sampleExamples[currentExampleIndex].icon}</span>
+                    <span>Try: {sampleExamples[currentExampleIndex].name}</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    <span>Add Files</span>
+                  </>
+                )}
               </button>
             </div>
-          </div>
 
+            {/* File Upload Section */}
+            {showFileUpload && (
+              <div className="mb-6 p-4 bg-gray-50/80 rounded-lg border-2 border-dashed border-gray-300">
+                <div className="text-center">
+                  <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                  <p className="text-sm font-medium text-gray-700 mb-1">
+                    Upload supporting files (max 3)
+                  </p>
+                  <p className="text-xs text-gray-500 mb-3">
+                    Loom transcripts, documentation, requirements, etc. (Text, PDF, Word)
+                  </p>
+                  <input
+                    type="file"
+                    multiple
+                    accept=".txt,.pdf,.doc,.docx"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    id="file-upload"
+                    disabled={uploadedFiles.length >= 3}
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all cursor-pointer ${
+                      uploadedFiles.length >= 3
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                    }`}
+                  >
+                    <Upload className="w-4 h-4" />
+                    {uploadedFiles.length >= 3 ? 'File limit reached' : 'Choose files'}
+                  </label>
+                </div>
+
+                {/* Uploaded Files List */}
+                {uploadedFiles.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    {uploadedFiles.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-white rounded border">
+                        <div className="flex items-center gap-2">
+                          <File className="w-4 h-4 text-blue-500" />
+                          <span className="text-sm font-medium text-gray-700">{file.name}</span>
+                          <span className="text-xs text-gray-500">
+                            ({(file.size / 1024).toFixed(1)} KB)
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => removeFile(index)}
+                          className="p-1 text-red-500 hover:text-red-700 rounded"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          
           <div className="space-y-6">
             {[
               {
@@ -332,7 +453,7 @@ const PRDCreator = ({ onLogout }) => {
                   Generating PRD...
                 </>
               ) : (
-                "Generate PRD"
+                'Generate PRD'
               )}
             </button>
 
@@ -377,6 +498,11 @@ const PRDCreator = ({ onLogout }) => {
               <div className="text-gray-500 text-center py-12">
                 <FileText className="w-12 h-12 mx-auto mb-3 text-gray-400" />
                 <p>Your PRD will appear here after answering the questions</p>
+                {uploadedFiles.length > 0 && (
+                  <p className="text-sm mt-2">
+                    + {uploadedFiles.length} supporting file{uploadedFiles.length > 1 ? 's' : ''} will be analyzed
+                  </p>
+                )}
               </div>
             )}
           </div>
