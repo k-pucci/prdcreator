@@ -301,62 +301,63 @@ const PRDCreator = ({ onLogout }) => {
               </button>
             </div>
 
-            {/* File Upload Section */}
-            {showFileUpload && (
-              <div className="mb-6 p-4 bg-gray-50/80 rounded-lg border-2 border-dashed border-gray-300">
-                <div className="text-center">
-                  <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm font-medium text-gray-700 mb-1">
-                    Upload supporting files (max 3)
-                  </p>
-                  <p className="text-xs text-gray-500 mb-3">
-                    Loom transcripts, documentation, requirements, etc. (Text, PDF, Word)
-                  </p>
-                  <input
-                    type="file"
-                    multiple
-                    accept=".txt,.pdf,.doc,.docx"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    id="file-upload"
-                    disabled={uploadedFiles.length >= 3}
-                  />
-                  <label
-                    htmlFor="file-upload"
-                    className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all cursor-pointer ${
-                      uploadedFiles.length >= 3
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                    }`}
-                  >
-                    <Upload className="w-4 h-4" />
-                    {uploadedFiles.length >= 3 ? 'File limit reached' : 'Choose files'}
-                  </label>
-                </div>
+{/* File Upload Section - Enhanced */}
+{showFileUpload && (
+  <div className="mb-6 p-4 upload-zone rounded-lg file-upload-area">
+    <div className="text-center">
+      <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+      <p className="text-sm font-medium text-gray-700 mb-1">
+        Upload supporting files (max 3)
+      </p>
+      <p className="text-xs text-gray-500 mb-3">
+        Loom transcripts, documentation, requirements, etc. (Text, PDF, Word)
+      </p>
+      <input
+        type="file"
+        multiple
+        accept=".txt,.pdf,.doc,.docx"
+        onChange={handleFileUpload}
+        className="hidden"
+        id="file-upload"
+        disabled={uploadedFiles.length >= 3}
+      />
+      <label
+        htmlFor="file-upload"
+        className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all cursor-pointer ${
+          uploadedFiles.length >= 3
+            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            : 'bg-blue-100 text-blue-700 hover:bg-blue-200 glass-button'
+        }`}
+      >
+        <Upload className="w-4 h-4" />
+        {uploadedFiles.length >= 3 ? 'File limit reached' : 'Choose files'}
+      </label>
+    </div>
 
-                {/* Uploaded Files List */}
-                {uploadedFiles.length > 0 && (
-                  <div className="mt-4 space-y-2">
-                    {uploadedFiles.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-white rounded border">
-                        <div className="flex items-center gap-2">
-                          <File className="w-4 h-4 text-blue-500" />
-                          <span className="text-sm font-medium text-gray-700">{file.name}</span>
-                          <span className="text-xs text-gray-500">
-                            ({(file.size / 1024).toFixed(1)} KB)
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => removeFile(index)}
-                          className="p-1 text-red-500 hover:text-red-700 rounded"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+    {/* Uploaded Files List - Enhanced */}
+    {uploadedFiles.length > 0 && (
+      <div className="mt-4 space-y-2">
+        {uploadedFiles.map((file, index) => (
+          <div key={index} className="flex items-center justify-between p-2 bg-white rounded border file-item success-fade-in">
+            <div className="flex items-center gap-2">
+              <File className="w-4 h-4 text-blue-500" />
+              <span className="text-sm font-medium text-gray-700">{file.name}</span>
+              <span className="text-xs text-gray-500">
+                ({(file.size / 1024).toFixed(1)} KB)
+              </span>
+            </div>
+            <button
+              onClick={() => removeFile(index)}
+              className="p-1 text-red-500 hover:text-red-700 rounded transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+)}
             )}
           </div>
           
