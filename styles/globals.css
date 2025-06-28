@@ -8,3 +8,261 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Custom animations for the blob background */
+@keyframes blob {
+  0% { 
+    transform: translate(0px, 0px) scale(1); 
+  }
+  33% { 
+    transform: translate(30px, -50px) scale(1.1); 
+  }
+  66% { 
+    transform: translate(-20px, 20px) scale(0.9); 
+  }
+  100% { 
+    transform: translate(0px, 0px) scale(1); 
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* File upload drag and drop styles */
+.file-upload-area {
+  transition: all 0.3s ease;
+}
+
+.file-upload-area:hover {
+  border-color: #3b82f6;
+  background-color: #f8fafc;
+}
+
+/* Custom scrollbar for the form area */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Enhance button hover effects */
+.btn-gradient {
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+  transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+  background: linear-gradient(45deg, #2563eb, #7c3aed);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* File item animations */
+.file-item {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading state for file processing */
+.file-processing {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Custom focus states for better accessibility */
+.custom-focus:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3b82f6;
+  ring-opacity: 0.5;
+  border-color: #3b82f6;
+}
+
+/* Glassmorphism enhancements */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.glass-button {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Improved markdown rendering */
+.prose {
+  color: #374151;
+  line-height: 1.6;
+}
+
+.prose h1 {
+  color: #111827;
+  font-weight: 700;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.prose h2 {
+  color: #1f2937;
+  font-weight: 600;
+  margin-top: 2rem;
+}
+
+.prose h3 {
+  color: #374151;
+  font-weight: 600;
+}
+
+.prose strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+.prose code {
+  background: #f3f4f6;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  color: #1f2937;
+}
+
+.prose pre {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.prose ul {
+  margin-left: 1.5rem;
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+}
+
+/* Toggle button styles */
+.toggle-active {
+  background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+  color: #1d4ed8;
+  border: 1px solid #93c5fd;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.toggle-inactive {
+  background: rgba(249, 250, 251, 0.8);
+  color: #6b7280;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+}
+
+.toggle-inactive:hover {
+  background: rgba(243, 244, 246, 0.9);
+  color: #374151;
+}
+
+/* File upload zone enhanced styling */
+.upload-zone {
+  border: 2px dashed #d1d5db;
+  background: rgba(249, 250, 251, 0.8);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.upload-zone:hover {
+  border-color: #3b82f6;
+  background: rgba(248, 250, 252, 0.9);
+}
+
+.upload-zone.drag-over {
+  border-color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.8);
+}
+
+/* Success states and animations */
+.success-fade-in {
+  animation: fadeInSuccess 0.5s ease-out;
+}
+
+@keyframes fadeInSuccess {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Error states */
+.error-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Responsive improvements */
+@media (max-width: 1024px) {
+  .glass-panel {
+    margin: 1rem;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .prose {
+    font-size: 0.875rem;
+  }
+  
+  .prose h1 {
+    font-size: 1.5rem;
+  }
+  
+  .prose h2 {
+    font-size: 1.25rem;
+  }
+}
